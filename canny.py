@@ -1,20 +1,50 @@
+####################################################
+## Developed by: Eashan Kaushik & Srijan Malhotra ##
+## Project Start: 8th October 2021                ##
+####################################################
 import cv2
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 import datetime
+from convoluion import SeConvolve
 
 GRSC_PATH = 'grsc.PNG'
 
 class CannyEdgeDetector:
     
     def __init__(self, image_path):
+        # Path of the image, on which canny detector will be applied
         self.image_path = image_path
+        # Read Image
         self.image_read()
-        self._gaussian_kernel = None
-        self._convolution_matrix_gx = None
-        self._convolution_matrix_gy = None
-        self._convolved_image = None
+        # Gaussian Kernel used for smoothing
+        self._gaussian_kernel = [[1, 1, 2, 2, 2, 1, 1], [1, 2, 2, 4, 2, 2, 1], [2, 2, 4, 8, 4, 2, 2], [2, 4, 8, 16, 8, 4, 2], [2, 2, 4, 8, 4, 2, 2], [1, 2, 2, 4, 2, 2, 1], [1, 1, 2, 2, 2, 1, 1]]
+        # Gradient x and y operations Prewitt's Operators
+        self._convolution_matrix_gx = [[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]]
+        self._convolution_matrix_gy = [[1, 1, 1], [0, 0, 0], [-1, -1, -1]]
+        # Output of step 1
+        self._smoothed_image = None
+        # Output of step 2
+        ## Normalized Output
+        self._gradient_x = None
+        self._gradient_y = None
+        self._magnitude = None
+        ## Normalized Output
+        self._gradient_x_norm = None
+        self._gradient_y_norm = None
+        self._magnitude_norm = None
+        ## Angle Output
+        self._angle = None
+        self._edge_angle = None
+        # Output of step 3
+        self._non_max_output = None
+        # Output of step 4
+        self._threshold_output = None
+    
+    #######################
+    ## Getter and Setter ##
+    #######################
     
     @property
     def gaussian_kernel(self):
@@ -24,25 +54,20 @@ class CannyEdgeDetector:
     def convolution_matrix_gx(self):
         return self._convolution_matrix_gx
     
-    @convolution_matrix_gx.setter
-    def convolution_matrix_gx(self, matrix_gx):
-        self._convolution_matrix_gx = matrix_gx
-    
     @property
     def convolution_matrix_gy(self):
         return self._convolution_matrix_gy
-    
-    @convolution_matrix_gy.setter
-    def convolution_matrix_gy(self, matrix_gy):
-        self._convolution_matrix_gy = matrix_gy
     
     @property
     def image_matrix(self):
         return self._image_matrix
     
     @property
-    def convolved_image(self):
-        return self._convolved_image
+    def smoothed_image(self):
+        return self._smoothed_image
+    
+    #######################
+    #######################
         
     def image_read(self):
         src = cv2.imread(self.image_path)
@@ -74,18 +99,23 @@ class CannyEdgeDetector:
             matrix.append(row)
         
         self._image_matrix = matrix
-
-        self.convolution(self._image_matrix, )
     
-    def convolution(self, self._im):
+    # Main procedure
+    def canny_detector(self):
+        pass
 
-        nrows, ncols = self._image_matrix.shape
-        new_image = np.zeros((nrows - 1, ncols - 1))
+    # Step 1: Gaussian Smoothing
+    def gaussian_smoothing(self):
+        pass
 
-        # TODO: Write convolution code
+    # Step 2: Gradient Operation
+    def gradient_operation(self):
+        pass
 
-        self._convolved_image = new_image
-        
-        
-        
-        
+    # Step 3: Non-Maxima Suppression
+    def non_max_suppression(self):
+        pass
+
+    # Step 4 Thresholding
+    def thresholding(self):
+        pass
