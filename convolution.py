@@ -8,12 +8,27 @@ class SeConvolve:
         self.image_matrix = image_matrix
         self.kernel = kernel
         self._output = None
-        self.co
+        self._output_norm = None
+    
+    #######################
+    ## Getter and Setter ##
+    #######################
     
     @property
     def output(self):
         return self._output
     
+    @property
+    def output_norm(self):
+        return self._output_norm
+    
+    #######################
+    #######################
+    
     def convolution(self):
-        # TODO: write here put 0 instead of dec size and normalize output
+        # TODO: write here put 0 instead of dec size
+        pass
+
+    def normalize(self):
+        # TODO: normalize _output
         pass

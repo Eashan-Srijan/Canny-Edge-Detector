@@ -65,10 +65,51 @@ class CannyEdgeDetector:
     @property
     def smoothed_image(self):
         return self._smoothed_image
+        
+    @property
+    def gradient_x(self):
+        return self._gradient_x
+            
+    @property
+    def gradient_y(self):
+        return self._gradient_y
+    
+    @property
+    def magnitude(self):
+        return self._magnitude
+        
+    @property
+    def gradient_x_norm(self):
+        return self._gradient_x_norm
+    
+    @property
+    def gradient_y_norm(self):
+        return self._gradient_y_norm
+    
+    @property
+    def magnitude_norm(self):
+        return self._magnitude_norm
+    
+    @property
+    def angle(self):
+        return self._angle
+    
+    @property
+    def edge_angle(self):
+        return self._edge_angle
+    
+    @property
+    def non_max_output(self):
+        return self._non_max_output
+    
+    @property
+    def threshold_output(self):
+        return self._threshold_output
     
     #######################
     #######################
         
+    #### Check out: img = np.array(Image.open('path_to_file\file.bmp'))
     def image_read(self):
         src = cv2.imread(self.image_path)
         self.img = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
@@ -78,8 +119,7 @@ class CannyEdgeDetector:
         plt.imsave('grsc/' + now_time + GRSC_PATH, self.img, cmap='gray')
 
         self.covert_to_matrix('grsc/' + now_time + GRSC_PATH)
-
-    
+  
     def covert_to_matrix(self, path):
 
         gsrc = cv2.imread(path, 0)
@@ -102,7 +142,11 @@ class CannyEdgeDetector:
     
     # Main procedure
     def canny_detector(self):
-        pass
+        
+        self.gaussian_smoothing()
+        self.gradient_operation()
+        self.non_max_suppression()
+        self.thresholding()
 
     # Step 1: Gaussian Smoothing
     def gaussian_smoothing(self):
