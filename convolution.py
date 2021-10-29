@@ -1,6 +1,6 @@
 ####################################################
 ## Developed by: Eashan Kaushik & Srijan Malhotra ##
-## Project Start: 8th October 2021                ##
+## Project Start: 29th October 2021               ##
 ####################################################
 class SeConvolve:
 
@@ -9,22 +9,22 @@ class SeConvolve:
         self.kernel = kernel
         self._output = None
         self._output_norm = None
-    
+
     #######################
     ## Getter and Setter ##
     #######################
-    
+
     @property
     def output(self):
         return self._output
-    
+
     @property
     def output_norm(self):
         return self._output_norm
-    
+
     #######################
     #######################
-    
+
     def convolution(self):
         # TODO: write here put 0 instead of dec size
         pass
