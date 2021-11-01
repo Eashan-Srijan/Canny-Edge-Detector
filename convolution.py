@@ -59,31 +59,28 @@ class SeConvolve:
             (self.kernel[6, 0] * self.image_matrix[i + 3, j - 3]) + (self.kernel[6, 1] * self.image_matrix[i + 3, j - 2]) + (self.kernel[6, 2] * self.image_matrix[i + 3, j - 1]) + \
             (self.kernel[6, 3] * self.image_matrix[i + 3, j]) + (self.kernel[6, 4] * self.image_matrix[i + 3, j + 1]) + (self.kernel[6, 5] * self.image_matrix[i + 3, j + 2]) + \
             (self.kernel[6, 6] * self.image_matrix[i + 3, j + 3])
-      
+
       elif self.mode == 'gradient':
-      
-        Px = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
-        Py = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
+
         for i in range(4,height - 4):
           for j in range(4,width - 4):
-            self._output[i,j] = (Sx[0, 0] * grey[i - 1, j - 1]) + \
-                                (Sx[0, 1] * grey[i - 1, j]) + \
-                      (Sx[0, 2] * grey[i - 1, j + 1]) + \
-                      (Sx[1, 0] * grey[i, j - 1]) + \
-                      (Sx[1, 1] * grey[i, j]) + \
-                      (Sx[1, 2] * grey[i, j + 1]) + \
-                      (Sx[2, 0] * grey[i + 1, j - 1]) + \
-                      (Sx[2, 1] * grey[i + 1, j]) + \
-                      (Sx[2, 2] * grey[i + 1, j + 1])
-                      
+            self._output[i,j] = (self.kernel[0, 0] * self.image_matrix[i - 1, j - 1]) + \
+                                (self.kernel[0, 1] * self.image_matrix[i - 1, j]) + \
+                      (self.kernel[0, 2] * self.image_matrix[i - 1, j + 1]) + \
+                      (self.kernel[1, 0] * self.image_matrix[i, j - 1]) + \
+                      (self.kernel[1, 1] * self.image_matrix[i, j]) + \
+                      (self.kernel[1, 2] * self.image_matrix[i, j + 1]) + \
+                      (self.kernel[2, 0] * self.image_matrix[i + 1, j - 1]) + \
+                      (self.kernel[2, 1] * self.image_matrix[i + 1, j]) + \
+                      (self.kernel[2, 2] * self.image_matrix[i + 1, j + 1])
+
       self.normalize()
-    
+
       return self._output_norm
-    
+
     def normalize(self):
       if self.mode == 'smoothing':
         self._output_norm = self.output / np.sum(self.kernel)
       elif self.mode == 'gradient':
         temp_kernel = np.absolute(self.kernel)
         self._output_norm = self.output / np.sum(self.kernel)
-
