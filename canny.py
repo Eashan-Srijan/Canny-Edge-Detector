@@ -21,8 +21,8 @@ class CannyEdgeDetector:
         # Gaussian Kernel used for smoothing
         self._gaussian_kernel = np.array([[1.0,1.0,2.0,2.0,2.0,1.0,1.0],[1.0,2.0,2.0,4.0,2.0,2.0,1.0],[2.0,2.0,4.0,8.0,4.0,2.0,2.0],[2.0,4.0,8.0,16.0,8.0,4.0,2.0],[2.0,2.0,4.0,8.0,4.0,2.0,2.0],[1.0,2.0,2.0,4.0,2.0,2.0,1.0],[1.0,1.0,2.0,2.0,2.0,1.0,1.0]])
         # Gradient x and y operations Prewitt's Operators
-        self._convolution_matrix_gx = [[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]]
-        self._convolution_matrix_gy = [[1, 1, 1], [0, 0, 0], [-1, -1, -1]]
+        self._convolution_matrix_gx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+        self._convolution_matrix_gy = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
         # Output of step 1
         self._smoothed_image = None
         # Output of step 2
@@ -150,11 +150,16 @@ class CannyEdgeDetector:
 
     # Step 1: Gaussian Smoothing
     def gaussian_smoothing(self):
-        pass
+        smoothing = SeConvolve()
+
+        self._smoothed_image = smoothing.convolution(self._image_matrix, self._gaussian_kernel)
 
     # Step 2: Gradient Operation
     def gradient_operation(self):
-        pass
+        
+        gradient = SeConvolve()
+        self._gradient_x = gradient.convolution(self._smoothed_image, self._convolution_matrix_gx, mode='gradient')
+        self._gradient_y = gradient.convolution(self._smoothed_image, self._convolution_matrix_gy, mode='gradient')
 
     # Step 3: Non-Maxima Suppression
     def non_max_suppression(self):

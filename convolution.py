@@ -91,8 +91,11 @@ class SeConvolve:
                               (mask[6, 5] * grey[i + 3, j + 2]) + \
                               (mask[6, 6] * grey[i + 3, j + 3])
       
-      if mode == 'smoothing':
+      if self.mode == 'smoothing':
         self.normalize()
+        return self._output_norm
+      
+      return self._output
 
     def normalize(self):
         self._output_norm = self.output / np.sum(self.kernel)
