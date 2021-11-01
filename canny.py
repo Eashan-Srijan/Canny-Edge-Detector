@@ -19,7 +19,7 @@ class CannyEdgeDetector:
         # Read Image
         self.image_read()
         # Gaussian Kernel used for smoothing
-        self._gaussian_kernel = [[1, 1, 2, 2, 2, 1, 1], [1, 2, 2, 4, 2, 2, 1], [2, 2, 4, 8, 4, 2, 2], [2, 4, 8, 16, 8, 4, 2], [2, 2, 4, 8, 4, 2, 2], [1, 2, 2, 4, 2, 2, 1], [1, 1, 2, 2, 2, 1, 1]]
+        self._gaussian_kernel = np.array([[1.0,1.0,2.0,2.0,2.0,1.0,1.0],[1.0,2.0,2.0,4.0,2.0,2.0,1.0],[2.0,2.0,4.0,8.0,4.0,2.0,2.0],[2.0,4.0,8.0,16.0,8.0,4.0,2.0],[2.0,2.0,4.0,8.0,4.0,2.0,2.0],[1.0,2.0,2.0,4.0,2.0,2.0,1.0],[1.0,1.0,2.0,2.0,2.0,1.0,1.0]])
         # Gradient x and y operations Prewitt's Operators
         self._convolution_matrix_gx = [[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]]
         self._convolution_matrix_gy = [[1, 1, 1], [0, 0, 0], [-1, -1, -1]]
@@ -163,3 +163,48 @@ class CannyEdgeDetector:
     # Step 4 Thresholding
     def thresholding(self):
         pass
+
+
+    # Junk:
+
+
+    # def prewittop(b):
+    #   grey = np.array(Image.open(b)).astype(np.uint8)
+    #   print("The values of the read image are ")
+    #   print(grey)
+    #   height,width=grey.shape
+    #   Px = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+    #   Py = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
+    #   for i in range(5,height-5):
+    #     for j in range(5,width-5):
+    #        Sx =     (Sx[0, 0] * grey[i - 1, j - 1]) + \
+    #                 (Sx[0, 1] * grey[i - 1, j]) + \
+    #                 (Sx[0, 2] * grey[i - 1, j + 1]) + \
+    #                 (Sx[1, 0] * grey[i, j - 1]) + \
+    #                 (Sx[1, 1] * grey[i, j]) + \
+    #                 (Sx[1, 2] * grey[i, j + 1]) + \
+    #                 (Sx[2, 0] * grey[i + 1, j - 1]) + \
+    #                 (Sx[2, 1] * grey[i + 1, j]) + \
+    #                 (Sx[2, 2] * grey[i + 1, j + 1])
+
+    #        Sy =     (Sy[0, 0] * grey[i - 1, j - 1]) + \
+    #                 (Sy[0, 1] * grey[i - 1, j]) + \
+    #                 (Sy[0, 2] * grey[i - 1, j + 1]) + \
+    #                 (Sy[1, 0] * grey[i, j - 1]) + \
+    #                 (Sy[1, 1] * grey[i, j]) + \
+    #                 (Sy[1, 2] * grey[i, j + 1]) + \
+    #                 (Sy[2, 0] * grey[i + 1, j - 1]) + \
+    #                 (Sy[2, 1] * grey[i + 1, j]) + \
+    #                 (Sy[2, 2] * grey[i + 1, j + 1])
+    #        ngx=Sxgrad
+    #        ngy=Sygrad
+    #        if(ngx[i,j]==0):
+    #          tan[i,j]=90.0
+    #        else:
+    #         tan[i,j]=math.degrees(math.atan(ngy[i,j]/ngx[i,j]))
+    #         if (tan[i,j]<0):
+    #             tan[i,j]= tan[i,j] + 360
+
+    #         magnitude = np.sqrt(pow(Sxgrad, 2.0) + pow(Sygrad, 2.0))
+    #         nim[i - 1, j - 1] = mag
+    #     pass
