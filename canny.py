@@ -163,11 +163,20 @@ class CannyEdgeDetector:
         self._gradient_x = gradient.convolution(self._smoothed_image, self._convolution_matrix_gx, mode='gradient')
         self._gradient_y = gradient.convolution(self._smoothed_image, self._convolution_matrix_gy, mode='gradient')
         
-        # TODO: Magnitude, Angle and edge angle
-        self._magnitude = None
-        self._angle = None
-        self._edge_angle = None
+        self._magnitude = self.calcuate_magnitude(self._gradient_x, self._gradient_y)
+        self._angle, self._edge_angle = self.calculate_angle(self._gradient_x, self._gradient_y)
+    
+    # TODO: Magnitude, Angle and edge angle
+    def calcuate_magnitude(self, gradient_x, gradient_y):
+        magnitude = None
 
+        return magnitude
+    
+    def calculate_angle(self, gradient_x, gradient_y):
+        angle = None
+
+        edge_angle = angle +  90
+        return angle, edge_angle
 
 
     # Step 3: Non-Maxima Suppression

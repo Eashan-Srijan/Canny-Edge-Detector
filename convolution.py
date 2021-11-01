@@ -31,69 +31,70 @@ class SeConvolve:
 
     def convolution(self):
     # function to perform gaussian smoothing
-    # TODO: 
+    # TODO:
     # 1. remove '\'
     # 2. replace mask with self.kernel
     # 3. replace gray_img/ grey to self.image_matrix
-      
+
       height, width = self.image_matrix.shape
-      
+
       for i in range(3,height-3):
         for j in range(3,width-3):
-          
-          self._output[i,j] = (mask[0, 0] * gray_img[i - 3, j - 3]) + \
-                              (mask[0, 1] * grey[i - 3, j - 2]) + \
-                              (mask[0, 2] * grey[i - 3, j - 1]) + \
-                              (mask[0, 3] * grey[i - 3, j]) + \
-                              (mask[0, 4] * grey[i - 3, j + 1]) + \
-                              (mask[0, 5] * grey[i - 3, j + 2]) + \
-                              (mask[0, 6] * grey[i - 3, j + 3]) + \
-                              (mask[1, 0] * grey[i - 2, j - 3]) + \
-                              (mask[1, 1] * grey[i - 2, j - 2]) + \
-                              (mask[1, 2] * grey[i - 2, j - 1]) + \
-                              (mask[1, 3] * grey[i - 2, j]) + \
-                              (mask[1, 4] * grey[i - 2, j + 1]) + \
-                              (mask[1, 5] * grey[i - 2, j + 2]) + \
-                              (mask[1, 6] * grey[i - 2, j + 3]) + \
-                              (mask[2, 0] * grey[i - 1, j - 3]) + \
-                              (mask[2, 1] * grey[i - 1, j - 2]) + \
-                              (mask[2, 2] * grey[i - 1, j - 1]) + \
-                              (mask[2, 3] * grey[i - 1, j]) + \
-                              (mask[2, 4] * grey[i - 1, j + 1]) + \
-                              (mask[2, 5] * grey[i - 1, j + 2]) + \
-                              (mask[2, 6] * grey[i - 1, j + 3]) + \
-                              (mask[3, 0] * grey[i, j - 3]) + \
-                              (mask[3, 1] * grey[i, j - 2]) + \
-                              (mask[3, 2] * grey[i, j - 1]) + \
-                              (mask[3, 3] * grey[i, j]) + \
-                              (mask[3, 4] * grey[i, j + 1]) + \
-                              (mask[3, 5] * grey[i, j + 2]) + \
-                              (mask[3, 6] * grey[i, j + 3]) + \
-                              (mask[4, 0] * grey[i + 1, j - 3]) + \
-                              (mask[4, 1] * grey[i + 1, j - 2]) + \
-                              (mask[4, 2] * grey[i + 1, j - 1]) + \
-                              (mask[4, 3] * grey[i + 1, j]) + \
-                              (mask[4, 4] * grey[i + 1, j + 1]) + \
-                              (mask[4, 5] * grey[i + 1, j + 2]) + \
-                              (mask[4, 6] * grey[i + 1, j + 3]) + \
-                              (mask[5, 0] * grey[i + 2, j - 3]) + \
-                              (mask[5, 1] * grey[i + 2, j - 2]) + \
-                              (mask[5, 2] * grey[i + 2, j - 1]) + \
-                              (mask[5, 3] * grey[i + 2, j]) + \
-                              (mask[5, 4] * grey[i + 2, j + 1]) + \
-                              (mask[5, 5] * grey[i + 2, j + 2]) + \
-                              (mask[5, 6] * grey[i + 2, j + 3]) + \
-                              (mask[6, 0] * grey[i + 3, j - 3]) + \
-                              (mask[6, 1] * grey[i + 3, j - 2]) + \
-                              (mask[6, 2] * grey[i + 3, j - 1]) + \
-                              (mask[6, 3] * grey[i + 3, j]) + \
-                              (mask[6, 4] * grey[i + 3, j + 1]) + \
-                              (mask[6, 5] * grey[i + 3, j + 2]) + \
-                              (mask[6, 6] * grey[i + 3, j + 3])
-      
-      self.normalize()
 
-      return self._output_norm
+          self._output[i,j] = (self.kernel[0, 0] * self.image_matrix[i - 3, j - 3]) +
+                              (self.kernel[0, 1] * self.image_matrix[i - 3, j - 2]) +
+                              (self.kernel[0, 2] * self.image_matrix[i - 3, j - 1]) +
+                              (self.kernel[0, 3] * self.image_matrix[i - 3, j]) +
+                              (self.kernel[0, 4] * self.image_matrix[i - 3, j + 1]) +
+                              (self.kernel[0, 5] * self.image_matrix[i - 3, j + 2]) +
+                              (self.kernel[0, 6] * self.image_matrix[i - 3, j + 3]) +
+                              (self.kernel[1, 0] * self.image_matrix[i - 2, j - 3]) +
+                              (self.kernel[1, 1] * self.image_matrix[i - 2, j - 2]) +
+                              (self.kernel[1, 2] * self.image_matrix[i - 2, j - 1]) +
+                              (self.kernel[1, 3] * self.image_matrix[i - 2, j]) +
+                              (self.kernel[1, 4] * self.image_matrix[i - 2, j + 1]) +
+                              (self.kernel[1, 5] * self.image_matrix[i - 2, j + 2]) +
+                              (self.kernel[1, 6] * self.image_matrix[i - 2, j + 3]) +
+                              (self.kernel[2, 0] * self.image_matrix[i - 1, j - 3]) +
+                              (self.kernel[2, 1] * self.image_matrix[i - 1, j - 2]) +
+                              (self.kernel[2, 2] * self.image_matrix[i - 1, j - 1]) +
+                              (self.kernel[2, 3] * self.image_matrix[i - 1, j]) +
+                              (self.kernel[2, 4] * self.image_matrix[i - 1, j + 1]) +
+                              (self.kernel[2, 5] * self.image_matrix[i - 1, j + 2]) +
+                              (self.kernel[2, 6] * self.image_matrix[i - 1, j + 3]) +
+                              (self.kernel[3, 0] * self.image_matrix[i, j - 3]) +
+                              (self.kernel[3, 1] * self.image_matrix[i, j - 2]) +
+                              (self.kernel[3, 2] * self.image_matrix[i, j - 1]) +
+                              (self.kernel[3, 3] * self.image_matrix[i, j]) +
+                              (self.kernel[3, 4] * self.image_matrix[i, j + 1]) +
+                              (self.kernel[3, 5] * self.image_matrix[i, j + 2]) +
+                              (self.kernel[3, 6] * self.image_matrix[i, j + 3]) +
+                              (self.kernel[4, 0] * self.image_matrix[i + 1, j - 3]) +
+                              (self.kernel[4, 1] * self.image_matrix[i + 1, j - 2]) +
+                              (self.kernel[4, 2] * self.image_matrix[i + 1, j - 1]) +
+                              (self.kernel[4, 3] * self.image_matrix[i + 1, j]) +
+                              (self.kernel[4, 4] * self.image_matrix[i + 1, j + 1]) +
+                              (self.kernel[4, 5] * self.image_matrix[i + 1, j + 2]) +
+                              (self.kernel[4, 6] * self.image_matrix[i + 1, j + 3]) +
+                              (self.kernel[5, 0] * self.image_matrix[i + 2, j - 3]) +
+                              (self.kernel[5, 1] * self.image_matrix[i + 2, j - 2]) +
+                              (self.kernel[5, 2] * self.image_matrix[i + 2, j - 1]) +
+                              (self.kernel[5, 3] * self.image_matrix[i + 2, j]) +
+                              (self.kernel[5, 4] * self.image_matrix[i + 2, j + 1]) +
+                              (self.kernel[5, 5] * self.image_matrix[i + 2, j + 2]) +
+                              (self.kernel[5, 6] * self.image_matrix[i + 2, j + 3]) +
+                              (self.kernel[6, 0] * self.image_matrix[i + 3, j - 3]) +
+                              (self.kernel[6, 1] * self.image_matrix[i + 3, j - 2]) +
+                              (self.kernel[6, 2] * self.image_matrix[i + 3, j - 1]) +
+                              (self.kernel[6, 3] * self.image_matrix[i + 3, j]) +
+                              (self.kernel[6, 4] * self.image_matrix[i + 3, j + 1]) +
+                              (self.kernel[6, 5] * self.image_matrix[i + 3, j + 2]) +
+                              (self.kernel[6, 6] * self.image_matrix[i + 3, j + 3])
+
+    
+    self.normalize()
+    
+    return self._output_norm
     
     def normalize(self):
       if self.mode == 'smoothing':
