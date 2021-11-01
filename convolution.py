@@ -7,7 +7,7 @@ import numpy as np
 
 class SeConvolve:
 
-    def __init__(self, image_matrix, kernel):
+    def __init__(self, image_matrix, kernel, mode='smoothing'):
         self.image_matrix = image_matrix
         self.kernel = kernel
         self._output = None
@@ -91,7 +91,8 @@ class SeConvolve:
                               (mask[6, 5] * grey[i + 3, j + 2]) + \
                               (mask[6, 6] * grey[i + 3, j + 3])
       
-      self.normalize()
+      if mode == 'smoothing':
+        self.normalize()
 
     def normalize(self):
         self._output_norm = self.output / np.sum(self.kernel)
