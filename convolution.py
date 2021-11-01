@@ -91,11 +91,14 @@ class SeConvolve:
                               (mask[6, 5] * grey[i + 3, j + 2]) + \
                               (mask[6, 6] * grey[i + 3, j + 3])
       
-      if self.mode == 'smoothing':
-        self.normalize()
-        return self._output_norm
-      
-      return self._output
+      self.normalize()
 
+      return self._output_norm
+    
     def normalize(self):
+      if self.mode == 'smoothing':
         self._output_norm = self.output / np.sum(self.kernel)
+      elif self.mode == 'gradient':
+        temp_kernel = np.absolute(self.kernel)
+        self._output_norm = self.output / np.sum(self.kernel)
+

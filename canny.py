@@ -150,6 +150,7 @@ class CannyEdgeDetector:
 
     # Step 1: Gaussian Smoothing
     def gaussian_smoothing(self):
+        
         smoothing = SeConvolve()
 
         self._smoothed_image = smoothing.convolution(self._image_matrix, self._gaussian_kernel)
@@ -158,8 +159,16 @@ class CannyEdgeDetector:
     def gradient_operation(self):
         
         gradient = SeConvolve()
+        
         self._gradient_x = gradient.convolution(self._smoothed_image, self._convolution_matrix_gx, mode='gradient')
         self._gradient_y = gradient.convolution(self._smoothed_image, self._convolution_matrix_gy, mode='gradient')
+        
+        # TODO: Magnitude, Angle and edge angle
+        self._magnitude = None
+        self._angle = None
+        self._edge_angle = None
+
+
 
     # Step 3: Non-Maxima Suppression
     def non_max_suppression(self):
