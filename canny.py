@@ -6,11 +6,14 @@ import cv2
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from PIL import Image as im
 import datetime
-from convolution import SeConvolve
 import math
 import copy
+# The Convolution module is developed by us
+from convolution import SeConvolve
 
+# image name to save image after gray scale conversion
 GRSC_PATH = 'grsc.PNG'
 
 class CannyEdgeDetector:
@@ -121,17 +124,18 @@ class CannyEdgeDetector:
     #######################
     #######################
         
-    #### Check out: img = np.array(Image.open('path_to_file\file.bmp'))
+    # This function reads the path provided to it and calls the convert_to_matrix
     def image_read(self):
         src = cv2.imread(self.image_path)
         self.img = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         
         now_time = datetime.datetime.now().strftime("%d%m%Y%H%M%S")
 
-        plt.imsave(now_time + '-' + GRSC_PATH, self.img, cmap='gray')
+        plt.imsave('gray-op/' + now_time + '-' + GRSC_PATH, self.img, cmap='gray')
 
-        self.covert_to_matrix(now_time + '-' + GRSC_PATH)
-  
+        self.covert_to_matrix('gray-op/' + now_time + '-' + GRSC_PATH)
+    
+    # This function converts the image to numpy matrix
     def covert_to_matrix(self, path):
 
         gsrc = cv2.imread(path, 0)
@@ -152,36 +156,38 @@ class CannyEdgeDetector:
         
         self._image_matrix = np.array(matrix)
     
-    # Main procedure
+    # Main procedure - calls different functions to compute edge detection
     def canny_detector(self):
         
         self.gaussian_smoothing()
         self.gradient_operation()
         self.non_max_suppression()
         self.thresholding()
+        self.generate_output()
 
     # Step 1: Gaussian Smoothing
     def gaussian_smoothing(self):
-        
-        smoothing = SeConvolve(self._image_matrix, self._gaussian_kernel)
 
+        # Convolution done on the image_matrix
+        smoothing = SeConvolve(self._image_matrix, self._gaussian_kernel)
         self._smoothed_image = smoothing.convolution()
 
     # Step 2: Gradient Operation
     def gradient_operation(self):
         
+        # Convolution done on the image_matrix w.r.t gradient x
         gradient_x = SeConvolve(self._smoothed_image, self._convolution_matrix_gx, mode='gradient')
         self._gradient_x = gradient_x.convolution()
         
-        
+        # Convolution done on the image_matrix w.r.t gradient y
         gradient_x = SeConvolve(self._smoothed_image, self._convolution_matrix_gy, mode='gradient')
         self._gradient_y = gradient_x.convolution()
         
-        
+        # We compute gradient magnitude, gradient angle and edge angle 
         self._magnitude = self.calcuate_magnitude(self._gradient_x, self._gradient_y)
         self._angle, self._edge_angle = self.calculate_angle(self._gradient_x, self._gradient_y)
     
-    # TODO: Magnitude, Angle and edge angle
+    # This function calculates the gradient magnitude
     def calcuate_magnitude(self, gradient_x, gradient_y):
         height, width = gradient_x.shape
 
@@ -189,10 +195,12 @@ class CannyEdgeDetector:
 
         for i in range(4,height - 4):
             for j in range(4,width - 4):
+                # gradient calculated using root(gx**2 + gy**2)
                 temp = (gradient_x[i, j] ** 2) + (gradient_y[i, j] ** 2)
                 
                 magnitude[i - 4, j - 4] = math.sqrt(temp)
         
+        # same size as original image
         magnitude = np.pad(magnitude, 4, mode='constant')
 
         return magnitude
@@ -207,9 +215,11 @@ class CannyEdgeDetector:
         for i in range(4,height - 4):
             for j in range(4,width - 4):
                 if gradient_x[i, j]  != 0:
+                    # gradient angle computed using tan-1(gy/gx)
                     angle[i - 4, j - 4] = math.degrees(math.atan((gradient_y[i, j] / gradient_x[i, j])))
                     edge_angle[i - 4, j - 4] = angle[i - 4, j - 4] + 90
         
+        # same size as original image
         angle = np.pad(angle, 4, mode='constant')
         edge_angle = np.pad(angle, 4, mode='constant')
 
@@ -217,29 +227,53 @@ class CannyEdgeDetector:
 
     # Step 3: Non-Maxima Suppression
     def non_max_suppression(self):
-        angle = self._angle + 360
+        angle = self._angle
         magnitude = copy.deepcopy(self._magnitude)
 
         height, width = magnitude.shape
         
         for i in range(4,height - 4):
             for j in range(4,width - 4):
-                current_sector = self.sector(angle[i, j])
-                check_one, check_two = self.check(current_sector)
+                # this code calculates the sector the pixel belongs to according to gradient angle
+                if angle[i, j] < 0:
+                    current_sector = self.sector(angle[i, j] + 360)
+                else:
+                    current_sector = self.sector(angle[i, j])
+                
+                # this code returns which pixel we should compare with according to sector
+                check_one, check_two = self.check(current_sector, i, j)
                 check_one_x, check_one_y = check_one
                 check_two_x, check_two_y = check_two
 
+                # non max suppression
                 if not(magnitude[i, j] > magnitude[check_one_x, check_one_y] and magnitude[i, j] > magnitude[check_two_x, check_two_y]):
                     magnitude[i, j] = 0
         
         self._non_max_output = magnitude
-
     
+    # this function returns the sector value according to angle
     def sector(self, angle):
-        pass
-
-    def check(self, current_sector):
-        pass
+        if((0 <= angle <= 22.5) or (337.5 < angle <= 360) or (157.5 < angle <= 202.5)):
+            return '0'
+        elif((67.5 >= angle > 22.5) or (247.5 >= angle > 202.5)):
+            return '1'
+        elif((112.5 >= angle > 67.5) or (292.5 >= angle > 247.5)):
+            return '2'
+        elif((157.5 >= angle > 112.5) or (337.5>= angle > 292.5)):
+            return '3'
+        
+        return '0'
+    
+    # this function returns which pixel we should compare with according to sector
+    def check(self, current_sector, current_i, current_j):
+        if(current_sector == '0'):
+            return ((current_i,current_j-1), (current_i,current_j+1))
+        elif(current_sector == '1'):
+            return ((current_i-1,current_j+1), (current_i+1,current_j-1))
+        elif(current_sector == '2'):
+            return ((current_i-1,current_j), (current_i+1,current_j))
+        elif(current_sector == '3'):
+            return ((current_i-1,current_j-1), (current_i+1,current_j+1))
 
     # Step 4 Thresholding
     def thresholding(self):
@@ -247,22 +281,23 @@ class CannyEdgeDetector:
         temp_magnitude = copy.deepcopy(self._magnitude)
         temp_magnitude = temp_magnitude[4: temp_magnitude.shape[0] - 4, 4: temp_magnitude.shape[1] - 4].flatten()
 
-        
+        # output according to 25th Percentile
         magnitude = copy.deepcopy(self._magnitude)
         percentile = np.percentile(magnitude, 25)
-        self.threshold_output_25 = self.threshold(magnitude, percentile)
+        self._threshold_output_25 = self.threshold(magnitude, percentile)
 
-                
+        # output according to 50th Percentile
         magnitude = copy.deepcopy(self._magnitude)
         percentile = np.percentile(magnitude, 50)
-        self.threshold_output_50 = self.threshold(magnitude, percentile)
+        self._threshold_output_50 = self.threshold(magnitude, percentile)
 
-                
+        # output according to 75th Percentile  
         magnitude = copy.deepcopy(self._magnitude)
         percentile = np.percentile(magnitude, 75)
-        self.threshold_output_75 = self.threshold(magnitude, percentile)
+        self._threshold_output_75 = self.threshold(magnitude, percentile)
     
-    def threshold(magnitude, T):
+    # this function performs thresholding
+    def threshold(self, magnitude, T):
         
         height, width = magnitude.shape
 
@@ -273,3 +308,11 @@ class CannyEdgeDetector:
                     magnitude[i,j] = 0
         
         return magnitude
+    
+    # this function is used to save .PNG images of results
+    def generate_output(self):
+
+        name = self.image_path.split('.')[0].split('/')[-1]
+        plt.imsave('output/' + name + '-Tfirst.PNG', self._threshold_output_25, cmap='gray')
+        plt.imsave('output/' + name + '-Tsecond.PNG', self._threshold_output_50, cmap='gray')
+        plt.imsave('output/' + name + '-Tthird.PNG', self._threshold_output_75, cmap='gray')
