@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import datetime
 from convoluion import SeConvolve
 import math
+import copy
 
 GRSC_PATH = 'grsc.PNG'
 
@@ -186,64 +187,47 @@ class CannyEdgeDetector:
         height, width = gradient_x.shape
         
         angle = np.zeros(height - 8, width - 8)
+        edge_angle = np.zeros(height - 8, width - 8)
         
         for i in range(4,height - 4):
             for j in range(4,width - 4):
-                angle[i - 4, j - 4] = math.degrees(math.atan((gradient_x[i, j] / gradient_y[i, j])))
+                if gradient_x != 0:
+                    angle[i - 4, j - 4] = math.degrees(math.atan((gradient_y[i, j] / gradient_x[i, j])))
+                    edge_angle[i - 4, j - 4] = angle[i - 4, j - 4] + 90
+        
+        angle = np.pad(angle, 4, mode='constant')
+        edge_angle = np.pad(angle, 4, mode='constant')
 
-        edge_angle = angle +  90
         return angle, edge_angle
-
 
     # Step 3: Non-Maxima Suppression
     def non_max_suppression(self):
+        angle = self._angle + 360
+        magnitude = copy.deepcopy(self._magnitude)
+
+        height, width = magnitude.shape
+
+        non_max_output = np.zeros(height - 8, width - 8)
+        
+        for i in range(4,height - 4):
+            for j in range(4,width - 4):
+                current_sector = self.sector(angle[i, j])
+                check_one, check_two = self.check(current_sector)
+                check_one_x, check_one_y = check_one
+                check_two_x, check_two_y = check_two
+
+                if not(magnitude[i, j] > magnitude[check_one_x, check_one_y] and magnitude[i, j] > magnitude[check_two_x, check_two_y]):
+                    magnitude[i, j] = 0
+        
+        self._non_max_output = magnitude
+
+    
+    def sector(self, angle):
+        pass
+
+    def check(self, current_sector):
         pass
 
     # Step 4 Thresholding
     def thresholding(self):
-        pass
-
-
-    # Junk:
-
-
-    # def prewittop(b):
-    #   grey = np.array(Image.open(b)).astype(np.uint8)
-    #   print("The values of the read image are ")
-    #   print(grey)
-    #   height,width=grey.shape
-    #   Px = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
-    #   Py = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
-    #   for i in range(5,height-5):
-    #     for j in range(5,width-5):
-    #        Sx =     (Sx[0, 0] * grey[i - 1, j - 1]) + \
-    #                 (Sx[0, 1] * grey[i - 1, j]) + \
-    #                 (Sx[0, 2] * grey[i - 1, j + 1]) + \
-    #                 (Sx[1, 0] * grey[i, j - 1]) + \
-    #                 (Sx[1, 1] * grey[i, j]) + \
-    #                 (Sx[1, 2] * grey[i, j + 1]) + \
-    #                 (Sx[2, 0] * grey[i + 1, j - 1]) + \
-    #                 (Sx[2, 1] * grey[i + 1, j]) + \
-    #                 (Sx[2, 2] * grey[i + 1, j + 1])
-
-    #        Sy =     (Sy[0, 0] * grey[i - 1, j - 1]) + \
-    #                 (Sy[0, 1] * grey[i - 1, j]) + \
-    #                 (Sy[0, 2] * grey[i - 1, j + 1]) + \
-    #                 (Sy[1, 0] * grey[i, j - 1]) + \
-    #                 (Sy[1, 1] * grey[i, j]) + \
-    #                 (Sy[1, 2] * grey[i, j + 1]) + \
-    #                 (Sy[2, 0] * grey[i + 1, j - 1]) + \
-    #                 (Sy[2, 1] * grey[i + 1, j]) + \
-    #                 (Sy[2, 2] * grey[i + 1, j + 1])
-    #        ngx=Sxgrad
-    #        ngy=Sygrad
-    #        if(ngx[i,j]==0):
-    #          tan[i,j]=90.0
-    #        else:
-    #         tan[i,j]=math.degrees(math.atan(ngy[i,j]/ngx[i,j]))
-    #         if (tan[i,j]<0):
-    #             tan[i,j]= tan[i,j] + 360
-
-    #         magnitude = np.sqrt(pow(Sxgrad, 2.0) + pow(Sygrad, 2.0))
-    #         nim[i - 1, j - 1] = mag
-    #     pass
+        pass                                       
