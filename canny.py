@@ -2,6 +2,8 @@
 ## Developed by: Eashan Kaushik & Srijan Malhotra ##
 ## Project Start: 8th October 2021                ##
 ####################################################
+import os
+# cv2 is just used for reading images
 import cv2
 import numpy as np
 import math
@@ -10,6 +12,8 @@ from PIL import Image as im
 import datetime
 import math
 import copy
+import shutil
+
 # The Convolution module is developed by us
 from convolution import SeConvolve
 
@@ -31,20 +35,16 @@ class CannyEdgeDetector:
         # Output of step 1
         self._smoothed_image = None
         # Output of step 2
-        ## Normalized Output
         self._gradient_x = None
         self._gradient_y = None
+        # Output of step 3
         self._magnitude = None
-        ## Normalized Output
-        self._gradient_x_norm = None
-        self._gradient_y_norm = None
-        self._magnitude_norm = None
-        ## Angle Output
+        # Angle Output
         self._angle = None
         self._edge_angle = None
-        # Output of step 3
-        self._non_max_output = None
         # Output of step 4
+        self._non_max_output = None
+        # Output of step 5
         self._threshold_output_25 = None
         self._threshold_output_50 = None
         self._threshold_output_75 = None
@@ -84,18 +84,6 @@ class CannyEdgeDetector:
     @property
     def magnitude(self):
         return self._magnitude
-        
-    @property
-    def gradient_x_norm(self):
-        return self._gradient_x_norm
-    
-    @property
-    def gradient_y_norm(self):
-        return self._gradient_y_norm
-    
-    @property
-    def magnitude_norm(self):
-        return self._magnitude_norm
     
     @property
     def angle(self):
@@ -159,10 +147,15 @@ class CannyEdgeDetector:
     # Main procedure - calls different functions to compute edge detection
     def canny_detector(self):
         
+        # Gaussian Smoothing - Step1
         self.gaussian_smoothing()
+        # Gradient Operation Prewitt - Step 2 and 3
         self.gradient_operation()
+        # Non-Max Supression - Step4
         self.non_max_suppression()
+        # Thresholding - Step5
         self.thresholding()
+        # Generating output
         self.generate_output()
 
     # Step 1: Gaussian Smoothing
@@ -187,12 +180,15 @@ class CannyEdgeDetector:
         self._magnitude = self.calcuate_magnitude(self._gradient_x, self._gradient_y)
         self._angle, self._edge_angle = self.calculate_angle(self._gradient_x, self._gradient_y)
     
+    # Step 3: Magnitude computation
     # This function calculates the gradient magnitude
     def calcuate_magnitude(self, gradient_x, gradient_y):
         height, width = gradient_x.shape
 
+        # After gaussing smoothing and gradient computation we have lost a total of 8 rows and 8 columns
         magnitude = np.zeros((height - 8, width - 8))
 
+        # looping over the desired matrix
         for i in range(4,height - 4):
             for j in range(4,width - 4):
                 # gradient calculated using root(gx**2 + gy**2)
@@ -200,6 +196,8 @@ class CannyEdgeDetector:
                 
                 magnitude[i - 4, j - 4] = math.sqrt(temp)
         
+        # Nomralization of Magnitude
+        magnitude = magnitude / np.sum(magnitude)
         # same size as original image
         magnitude = np.pad(magnitude, 4, mode='constant')
 
@@ -209,9 +207,11 @@ class CannyEdgeDetector:
         
         height, width = gradient_x.shape
         
+        # After gaussing smoothing and gradient computation we have lost a total of 8 rows and 8 columns
         angle = np.zeros((height - 8, width - 8))
         edge_angle = np.zeros((height - 8, width - 8))
         
+        # looping over the desired matrix
         for i in range(4,height - 4):
             for j in range(4,width - 4):
                 if gradient_x[i, j]  != 0:
@@ -225,13 +225,14 @@ class CannyEdgeDetector:
 
         return angle, edge_angle
 
-    # Step 3: Non-Maxima Suppression
+    # Step 4: Non-Maxima Suppression
     def non_max_suppression(self):
         angle = self._angle
         magnitude = copy.deepcopy(self._magnitude)
 
         height, width = magnitude.shape
         
+        # looping over the desired matrix
         for i in range(4,height - 4):
             for j in range(4,width - 4):
                 # this code calculates the sector the pixel belongs to according to gradient angle
@@ -253,16 +254,20 @@ class CannyEdgeDetector:
     
     # this function returns the sector value according to angle
     def sector(self, angle):
+        # for sector 0
         if((0 <= angle <= 22.5) or (337.5 < angle <= 360) or (157.5 < angle <= 202.5)):
             return '0'
+        # for sector 1
         elif((67.5 >= angle > 22.5) or (247.5 >= angle > 202.5)):
             return '1'
+        # for sector 2
         elif((112.5 >= angle > 67.5) or (292.5 >= angle > 247.5)):
             return '2'
+        # for sector 3
         elif((157.5 >= angle > 112.5) or (337.5>= angle > 292.5)):
             return '3'
         
-        return '0'
+        # return '0'
     
     # this function returns which pixel we should compare with according to sector
     def check(self, current_sector, current_i, current_j):
@@ -275,7 +280,7 @@ class CannyEdgeDetector:
         elif(current_sector == '3'):
             return ((current_i-1,current_j-1), (current_i+1,current_j+1))
 
-    # Step 4 Thresholding
+    # Step 5 Thresholding
     def thresholding(self):
 
         temp_magnitude = copy.deepcopy(self._magnitude)
@@ -301,6 +306,7 @@ class CannyEdgeDetector:
         
         height, width = magnitude.shape
 
+        # looping over the desired matrix
         for i in range(4,height - 4):
             for j in range(4,width - 4):
 
@@ -313,6 +319,27 @@ class CannyEdgeDetector:
     def generate_output(self):
 
         name = self.image_path.split('.')[0].split('/')[-1]
-        plt.imsave('output/' + name + '-Tfirst.PNG', self._threshold_output_25, cmap='gray')
-        plt.imsave('output/' + name + '-Tsecond.PNG', self._threshold_output_50, cmap='gray')
-        plt.imsave('output/' + name + '-Tthird.PNG', self._threshold_output_75, cmap='gray')
+        name = 'Output/' + name
+
+        if os.path.isdir(name):
+            shutil.rmtree(name)
+
+        os.mkdir(name + '/')
+
+        # Output of step 1
+        plt.imsave(name + '/' + 'GaussianSmoothing.PNG', self._smoothed_image, cmap='gray')
+
+        # Output of step 2
+        plt.imsave(name + '/' + 'GradientX.PNG', self._gradient_x, cmap='gray')
+        plt.imsave(name + '/' + 'GradientY.PNG', self._gradient_y, cmap='gray')
+
+        # Output of step 3
+        plt.imsave(name + '/' + 'GradientMagnitude.PNG', self._magnitude, cmap='gray')
+
+        # Output of Step 4
+        plt.imsave(name + '/' + 'Non-Max.PNG', self._non_max_output, cmap='gray')
+        
+        # Output of step 5
+        plt.imsave(name + '/' + 'T25.PNG', self._threshold_output_25, cmap='gray')
+        plt.imsave(name + '/' + 'T50.PNG', self._threshold_output_50, cmap='gray')
+        plt.imsave(name + '/' + 'T75.PNG', self._threshold_output_75, cmap='gray')

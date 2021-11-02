@@ -5,5 +5,8 @@
 from canny import CannyEdgeDetector
 
 if __name__ == '__main__':
-    canny_edge_detector = CannyEdgeDetector('Test.bmp')
+    detector = CannyEdgeDetector('C:/Users/Eashan/Desktop/canny-edge-detector/Images/Test-patterns.bmp')
+    detector.canny_detector()
 
+    detector = CannyEdgeDetector('C:/Users/Eashan/Desktop/canny-edge-detector/Images/House.bmp')
+    detector.canny_detector()
