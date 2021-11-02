@@ -14,7 +14,7 @@ import copy
 GRSC_PATH = 'grsc.PNG'
 
 class CannyEdgeDetector:
-    
+
     def __init__(self, image_path):
         # Path of the image, on which canny detector will be applied
         self.image_path = image_path
@@ -43,11 +43,11 @@ class CannyEdgeDetector:
         self._non_max_output = None
         # Output of step 4
         self._threshold_output = None
-    
+
     #######################
     ## Getter and Setter ##
     #######################
-    
+
     @property
     def gaussian_kernel(self):
         return self._gaussian_kernel
@@ -55,96 +55,96 @@ class CannyEdgeDetector:
     @property
     def convolution_matrix_gx(self):
         return self._convolution_matrix_gx
-    
+
     @property
     def convolution_matrix_gy(self):
         return self._convolution_matrix_gy
-    
+
     @property
     def image_matrix(self):
         return self._image_matrix
-    
+
     @property
     def smoothed_image(self):
         return self._smoothed_image
-        
+
     @property
     def gradient_x(self):
         return self._gradient_x
-            
+
     @property
     def gradient_y(self):
         return self._gradient_y
-    
+
     @property
     def magnitude(self):
         return self._magnitude
-        
+
     @property
     def gradient_x_norm(self):
         return self._gradient_x_norm
-    
+
     @property
     def gradient_y_norm(self):
         return self._gradient_y_norm
-    
+
     @property
     def magnitude_norm(self):
         return self._magnitude_norm
-    
+
     @property
     def angle(self):
         return self._angle
-    
+
     @property
     def edge_angle(self):
         return self._edge_angle
-    
+
     @property
     def non_max_output(self):
         return self._non_max_output
-    
+
     @property
     def threshold_output(self):
         return self._threshold_output
-    
+
     #######################
     #######################
-        
+
     #### Check out: img = np.array(Image.open('path_to_file\file.bmp'))
     def image_read(self):
         src = cv2.imread(self.image_path)
         self.img = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-        
+
         now_time = datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
 
         plt.imsave('grsc/' + now_time + GRSC_PATH, self.img, cmap='gray')
 
         self.covert_to_matrix('grsc/' + now_time + GRSC_PATH)
-  
+
     def covert_to_matrix(self, path):
 
         gsrc = cv2.imread(path, 0)
-        
+
         matrix = list()
-        
+
         for row_index in range(0, gsrc.shape[0]):
 
             row = []
-            
+
             for column_index in range(0, gsrc.shape[1]):
-            
+
                 pixel = gsrc.item(row_index, column_index)
-            
+
                 row.append(pixel)
-            
+
             matrix.append(row)
-        
+
         self._image_matrix = matrix
-    
+
     # Main procedure
     def canny_detector(self):
-        
+
         self.gaussian_smoothing()
         self.gradient_operation()
         self.non_max_suppression()
@@ -152,22 +152,22 @@ class CannyEdgeDetector:
 
     # Step 1: Gaussian Smoothing
     def gaussian_smoothing(self):
-        
+
         smoothing = SeConvolve()
 
         self._smoothed_image = smoothing.convolution(self._image_matrix, self._gaussian_kernel)
 
     # Step 2: Gradient Operation
     def gradient_operation(self):
-        
+
         gradient = SeConvolve()
-        
+
         self._gradient_x = gradient.convolution(self._smoothed_image, self._convolution_matrix_gx, mode='gradient')
         self._gradient_y = gradient.convolution(self._smoothed_image, self._convolution_matrix_gy, mode='gradient')
-        
+
         self._magnitude = self.calcuate_magnitude(self._gradient_x, self._gradient_y)
         self._angle, self._edge_angle = self.calculate_angle(self._gradient_x, self._gradient_y)
-    
+
     # TODO: Magnitude, Angle and edge angle
     def calcuate_magnitude(self, gradient_x, gradient_y):
         height, width = gradient_x.shape
@@ -177,24 +177,24 @@ class CannyEdgeDetector:
         for i in range(4,height - 4):
             for j in range(4,width - 4):
                 temp = (gradient_x[i, j] ** 2) + (gradient_y[i, j] ** 2)
-                
+
                 magnitude[i - 4, j - 4] = math.sqrt(temp)
-        
+
         return magnitude
-    
+
     def calculate_angle(self, gradient_x, gradient_y):
-        
+
         height, width = gradient_x.shape
-        
+
         angle = np.zeros(height - 8, width - 8)
         edge_angle = np.zeros(height - 8, width - 8)
-        
+
         for i in range(4,height - 4):
             for j in range(4,width - 4):
                 if gradient_x != 0:
                     angle[i - 4, j - 4] = math.degrees(math.atan((gradient_y[i, j] / gradient_x[i, j])))
                     edge_angle[i - 4, j - 4] = angle[i - 4, j - 4] + 90
-        
+
         angle = np.pad(angle, 4, mode='constant')
         edge_angle = np.pad(angle, 4, mode='constant')
 
@@ -208,7 +208,7 @@ class CannyEdgeDetector:
         height, width = magnitude.shape
 
         non_max_output = np.zeros(height - 8, width - 8)
-        
+
         for i in range(4,height - 4):
             for j in range(4,width - 4):
                 current_sector = self.sector(angle[i, j])
@@ -218,11 +218,19 @@ class CannyEdgeDetector:
 
                 if not(magnitude[i, j] > magnitude[check_one_x, check_one_y] and magnitude[i, j] > magnitude[check_two_x, check_two_y]):
                     magnitude[i, j] = 0
-        
+
         self._non_max_output = magnitude
 
-    
+
     def sector(self, angle):
+        if((22.5 >= angle >= 337.6) && (202.5 >= angle >= 157.5)):
+        return 0
+        elif((67.5 >= angle >= 22.6) && (247.5 >= angle >= 202.6)):
+        return 1
+        elif((112.5 >= angle >= 67.6) && (292.5 >= angle >= 247.6)):
+        return 2
+        elif((157.5 >= angle >= 112.5) && (337.5>= angle >= 292.6)):
+        return 3
         pass
 
     def check(self, current_sector):
@@ -230,4 +238,4 @@ class CannyEdgeDetector:
 
     # Step 4 Thresholding
     def thresholding(self):
-        pass                                       
+        pass
