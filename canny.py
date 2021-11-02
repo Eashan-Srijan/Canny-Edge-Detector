@@ -224,13 +224,13 @@ class CannyEdgeDetector:
 
     def sector(self, angle):
         if((22.5 >= angle >= 337.6) && (202.5 >= angle >= 157.5)):
-        return 0
+        return current_sector = 0
         elif((67.5 >= angle >= 22.6) && (247.5 >= angle >= 202.6)):
-        return 1
+        return current_sector = 1
         elif((112.5 >= angle >= 67.6) && (292.5 >= angle >= 247.6)):
-        return 2
+        return current_sector = 2
         elif((157.5 >= angle >= 112.5) && (337.5>= angle >= 292.6)):
-        return 3
+        return current_sector = 3 
         pass
 
     def check(self, current_sector):
