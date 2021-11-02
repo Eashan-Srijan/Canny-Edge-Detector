@@ -169,8 +169,16 @@ class CannyEdgeDetector:
     
     # TODO: Magnitude, Angle and edge angle
     def calcuate_magnitude(self, gradient_x, gradient_y):
-        magnitude = None
+        height, width = gradient_x.shape
 
+        magnitude = np.zeros(height - 8, width - 8)
+
+        for i in range(4,height - 4):
+            for j in range(4,width - 4):
+                temp = (gradient_x[i, j] ** 2) + (gradient_y[i, j] ** 2)
+                
+                magnitude[i - 4, j - 4] = math.sqrt(temp)
+        
         return magnitude
     
     def calculate_angle(self, gradient_x, gradient_y):
@@ -180,8 +188,8 @@ class CannyEdgeDetector:
         angle = np.zeros(height - 8, width - 8)
         
         for i in range(4,height - 4):
-          for j in range(4,width - 4):
-              angle[i - 4, j - 4] = math.degrees(math.atan(gradient_x[i, j] / gradient_y[i, j]))
+            for j in range(4,width - 4):
+                angle[i - 4, j - 4] = math.degrees(math.atan((gradient_x[i, j] / gradient_y[i, j])))
 
         edge_angle = angle +  90
         return angle, edge_angle

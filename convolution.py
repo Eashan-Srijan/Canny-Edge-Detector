@@ -37,12 +37,14 @@ class SeConvolve:
     # 3. replace gray_img/ grey to self.image_matrix
 
       height, width = self.image_matrix.shape
+      
 
       if self.mode == 'smoothing':
+        self._output = np.zeros((height - 6, width - 6))
         for i in range(3,height-3):
           for j in range(3,width-3):
 
-            self._output[i,j] = (self.kernel[0, 0] * self.image_matrix[i - 3, j - 3]) + (self.kernel[0, 1] * self.image_matrix[i - 3, j - 2]) + (self.kernel[0, 2] * self.image_matrix[i - 3, j - 1]) + \
+            self._output[i - 3,j - 3] = (self.kernel[0, 0] * self.image_matrix[i - 3, j - 3]) + (self.kernel[0, 1] * self.image_matrix[i - 3, j - 2]) + (self.kernel[0, 2] * self.image_matrix[i - 3, j - 1]) + \
             (self.kernel[0, 3] * self.image_matrix[i - 3, j]) + (self.kernel[0, 4] * self.image_matrix[i - 3, j + 1]) + (self.kernel[0, 5] * self.image_matrix[i - 3, j + 2]) + \
             (self.kernel[0, 6] * self.image_matrix[i - 3, j + 3]) + (self.kernel[1, 0] * self.image_matrix[i - 2, j - 3]) + (self.kernel[1, 1] * self.image_matrix[i - 2, j - 2]) + \
             (self.kernel[1, 2] * self.image_matrix[i - 2, j - 1]) + (self.kernel[1, 3] * self.image_matrix[i - 2, j]) + (self.kernel[1, 4] * self.image_matrix[i - 2, j + 1]) + \
@@ -61,11 +63,12 @@ class SeConvolve:
             (self.kernel[6, 6] * self.image_matrix[i + 3, j + 3])
 
       elif self.mode == 'gradient':
+        self._output = np.zeros((height - 8, width - 8))
 
         for i in range(4,height - 4):
           for j in range(4,width - 4):
-            self._output[i,j] = (self.kernel[0, 0] * self.image_matrix[i - 1, j - 1]) + \
-                                (self.kernel[0, 1] * self.image_matrix[i - 1, j]) + \
+            self._output[i - 4,j - 4] = (self.kernel[0, 0] * self.image_matrix[i - 1, j - 1]) + \
+                      (self.kernel[0, 1] * self.image_matrix[i - 1, j]) + \
                       (self.kernel[0, 2] * self.image_matrix[i - 1, j + 1]) + \
                       (self.kernel[1, 0] * self.image_matrix[i, j - 1]) + \
                       (self.kernel[1, 1] * self.image_matrix[i, j]) + \
@@ -80,7 +83,9 @@ class SeConvolve:
 
     def normalize(self):
       if self.mode == 'smoothing':
-        self._output_norm = self.output / np.sum(self.kernel)
+        self._output_norm = self.output / np.sum(self.output)
+        self._output_norm = np.pad(self._output_norm, 3, mode='constant')
       elif self.mode == 'gradient':
-        temp_kernel = np.absolute(self.kernel)
-        self._output_norm = self.output / np.sum(self.kernel)
+        temp_output = np.absolute(self.output)
+        self._output_norm = self.output / np.sum(temp_output)
+        self._output_norm = np.pad(self._output_norm, 4, mode='constant')
