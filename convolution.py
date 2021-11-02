@@ -32,18 +32,15 @@ class SeConvolve:
 
     def convolution(self):
     # function to perform gaussian smoothing
-    # TODO:
-    # 1. remove '\'
-    # 2. replace mask with self.kernel
-    # 3. replace gray_img/ grey to self.image_matrix
 
       height, width = self.image_matrix.shape
-      
 
       if self.mode == 'smoothing':
         self._output = np.zeros((height - 6, width - 6))
         for i in range(3,height-3):
           for j in range(3,width-3):
+
+    # martix multiplication for convolution
 
             self._output[i - 3,j - 3] = (self.kernel[0, 0] * self.image_matrix[i - 3, j - 3]) + (self.kernel[0, 1] * self.image_matrix[i - 3, j - 2]) + (self.kernel[0, 2] * self.image_matrix[i - 3, j - 1]) + \
             (self.kernel[0, 3] * self.image_matrix[i - 3, j]) + (self.kernel[0, 4] * self.image_matrix[i - 3, j + 1]) + (self.kernel[0, 5] * self.image_matrix[i - 3, j + 2]) + \
@@ -63,6 +60,7 @@ class SeConvolve:
             (self.kernel[6, 3] * self.image_matrix[i + 3, j]) + (self.kernel[6, 4] * self.image_matrix[i + 3, j + 1]) + (self.kernel[6, 5] * self.image_matrix[i + 3, j + 2]) + \
             (self.kernel[6, 6] * self.image_matrix[i + 3, j + 3])
 
+    # function to find the gradients 
       elif self.mode == 'gradient':
         self._output = np.zeros((height - 8, width - 8))
 
@@ -82,10 +80,13 @@ class SeConvolve:
 
       return self._output_norm
 
+    # normalize
     def normalize(self):
+    # normalize using sum of all values
       if self.mode == 'smoothing':
         self._output_norm = self.output / np.sum(self.output)
         self._output_norm = np.pad(self._output_norm, 3, mode='constant')
+    # normalize using absolute values
       elif self.mode == 'gradient':
         temp_output = np.absolute(self.output)
         self._output_norm = self.output / np.sum(temp_output)
