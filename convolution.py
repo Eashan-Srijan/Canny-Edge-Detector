@@ -12,6 +12,7 @@ class SeConvolve:
         self.kernel = kernel
         self._output = None
         self._output_norm = None
+        self.mode = mode
         self.convolution()
 
     #######################
