@@ -212,7 +212,7 @@ class CannyEdgeDetector:
         for i in range(4,height - 4):
             for j in range(4,width - 4):
                 current_sector = self.sector(angle[i, j])
-                check_one, check_two = self.check(current_sector)
+                check_one, check_two = self.check(current_sector, i, j)
                 check_one_x, check_one_y = check_one
                 check_two_x, check_two_y = check_two
 
@@ -223,18 +223,24 @@ class CannyEdgeDetector:
 
 
     def sector(self, angle):
-        if((22.5 >= angle >= 337.6) && (202.5 >= angle >= 157.5)):
-        return current_sector = 0
-        elif((67.5 >= angle >= 22.6) && (247.5 >= angle >= 202.6)):
-        return current_sector = 1
-        elif((112.5 >= angle >= 67.6) && (292.5 >= angle >= 247.6)):
-        return current_sector = 2
-        elif((157.5 >= angle >= 112.5) && (337.5>= angle >= 292.6)):
-        return current_sector = 3 
-        pass
+        if((0 <= angle <= 22.5) or (337.5 <= angle <= 360) or (157.5 < angle <= 202.5)):
+            return '0'
+        elif((67.5 >= angle > 22.5) or (247.5 >= angle > 202.5)):
+            return '1'
+        elif((112.5 >= angle > 67.5) or (292.5 >= angle > 247.5)):
+            return '2'
+        elif((157.5 >= angle > 112.5) or (337.5>= angle > 292.5)):
+            return '3'
 
-    def check(self, current_sector):
-        pass
+    def check(self, current_sector, current_i, current_j):
+        if(current_sector == '0'):
+            return (current_i,curent_j-1), (current_i,current_j+1)
+        elif(current_sector == '1'):
+            return (current_i-1,curent_j+1), (current_i+1,current_j-1)
+        elif(current_sector == '2'):
+            return (current_i-1,curent_j), (current_i+1,current_j)
+        elif(current_sector == '3'):
+            return (current_i-1,curent_j-1), (current_i+1,current_j+1)
 
     # Step 4 Thresholding
     def thresholding(self):
