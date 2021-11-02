@@ -206,7 +206,7 @@ class CannyEdgeDetector:
         
         for i in range(4,height - 4):
             for j in range(4,width - 4):
-                if gradient_x[i, j] != 0:
+                if gradient_x[i, j]  != 0:
                     angle[i - 4, j - 4] = math.degrees(math.atan((gradient_y[i, j] / gradient_x[i, j])))
                     edge_angle[i - 4, j - 4] = angle[i - 4, j - 4] + 90
         
