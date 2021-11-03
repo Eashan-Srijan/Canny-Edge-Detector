@@ -337,19 +337,19 @@ class CannyEdgeDetector:
         os.mkdir(name + '/')
 
         # Output of step 1
-        plt.imsave(name + '/' + 'GaussianSmoothing.PNG', self._smoothed_image, cmap='gray')
+        plt.imsave(name + '/' + 'GaussianSmoothing.bmp', self._smoothed_image, cmap='gray')
 
         # Output of step 2
-        plt.imsave(name + '/' + 'GradientX.PNG', self._gradient_x, cmap='gray')
-        plt.imsave(name + '/' + 'GradientY.PNG', self._gradient_y, cmap='gray')
+        plt.imsave(name + '/' + 'GradientX.bmp', self._gradient_x, cmap='gray')
+        plt.imsave(name + '/' + 'GradientY.bmp', self._gradient_y, cmap='gray')
 
         # Output of step 3
-        plt.imsave(name + '/' + 'GradientMagnitude.PNG', self._magnitude, cmap='gray')
+        plt.imsave(name + '/' + 'GradientMagnitude.bmp', self._magnitude, cmap='gray')
 
         # Output of Step 4
-        plt.imsave(name + '/' + 'Non-Max.PNG', self._non_max_output, cmap='gray')
+        plt.imsave(name + '/' + 'Non-Max.bmp', self._non_max_output, cmap='gray')
         
         # Output of step 5
-        plt.imsave(name + '/' + 'T25.PNG', self._threshold_output_25, cmap='gray')
-        plt.imsave(name + '/' + 'T50.PNG', self._threshold_output_50, cmap='gray')
-        plt.imsave(name + '/' + 'T75.PNG', self._threshold_output_75, cmap='gray')
+        plt.imsave(name + '/' + 'T25.bmp', self._threshold_output_25, cmap='gray')
+        plt.imsave(name + '/' + 'T50.bmp', self._threshold_output_50, cmap='gray')
+        plt.imsave(name + '/' + 'T75.bmp', self._threshold_output_75, cmap='gray')
