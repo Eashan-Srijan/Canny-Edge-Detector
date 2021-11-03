@@ -18,8 +18,6 @@ class SeConvolve:
         self._output_norm = None
         # mode smoothing or gradient
         self.mode = mode
-        # calling the convolution function
-        self.convolution()
 
     #######################
     ## Getter and Setter ##
@@ -76,29 +74,24 @@ class SeConvolve:
           for j in range(4,width - 4):
             # martix multiplication for gradient computation
             # prewit convolution after gaussian smoothing leads to loss of 4 rows and 4 columns thats why we start from i-4 and j-4
-            self._output[i - 4,j - 4] = (self.kernel[0, 0] * self.image_matrix[i - 1, j - 1]) + \
-                      (self.kernel[0, 1] * self.image_matrix[i - 1, j]) + \
-                      (self.kernel[0, 2] * self.image_matrix[i - 1, j + 1]) + \
-                      (self.kernel[1, 0] * self.image_matrix[i, j - 1]) + \
-                      (self.kernel[1, 1] * self.image_matrix[i, j]) + \
-                      (self.kernel[1, 2] * self.image_matrix[i, j + 1]) + \
-                      (self.kernel[2, 0] * self.image_matrix[i + 1, j - 1]) + \
-                      (self.kernel[2, 1] * self.image_matrix[i + 1, j]) + \
-                      (self.kernel[2, 2] * self.image_matrix[i + 1, j + 1])
+            self._output[i - 4,j - 4] = (self.kernel[0, 0] * self.image_matrix[i - 1, j - 1]) + (self.kernel[0, 1] * self.image_matrix[i - 1, j]) + (self.kernel[0, 2] * self.image_matrix[i - 1, j + 1]) + \
+                      (self.kernel[1, 0] * self.image_matrix[i, j - 1]) + (self.kernel[1, 1] * self.image_matrix[i, j]) + (self.kernel[1, 2] * self.image_matrix[i, j + 1]) + (self.kernel[2, 0] * self.image_matrix[i + 1, j - 1]) + \
+                      (self.kernel[2, 1] * self.image_matrix[i + 1, j]) + (self.kernel[2, 2] * self.image_matrix[i + 1, j + 1])
 
       # we call the normalize function to normalize the output
       self.normalize()
 
-      return self._output_norm
+      return self._output, self._output_norm
 
     # normalize
     def normalize(self):
       if self.mode == 'smoothing':
         # normalize using sum of all values
-        self._output_norm = self.output / np.sum(self.output)
+        self._output_norm = self._output / 140
         self._output_norm = np.pad(self._output_norm, 3, mode='constant')
+
       elif self.mode == 'gradient':
         # normalize using sum of absolute values
-        temp_output = np.absolute(self.output)
-        self._output_norm = self.output / np.sum(temp_output)
+        temp_output = np.absolute(self._output)
+        self._output_norm = temp_output / 3
         self._output_norm = np.pad(self._output_norm, 4, mode='constant')

@@ -37,8 +37,11 @@ class CannyEdgeDetector:
         # Output of step 2
         self._gradient_x = None
         self._gradient_y = None
+        self._gradient_x_norm = None
+        self._gradient_y_norm = None
         # Output of step 3
         self._magnitude = None
+        self._magnitude_norm = None
         # Angle Output
         self._angle = None
         self._edge_angle = None
@@ -166,21 +169,21 @@ class CannyEdgeDetector:
 
         # Convolution done on the image_matrix
         smoothing = SeConvolve(self._image_matrix, self._gaussian_kernel)
-        self._smoothed_image = smoothing.convolution()
+        _, self._smoothed_image = smoothing.convolution()
 
     # Step 2: Gradient Operation
     def gradient_operation(self):
         
         # Convolution done on the image_matrix w.r.t gradient x
         gradient_x = SeConvolve(self._smoothed_image, self._convolution_matrix_gx, mode='gradient')
-        self._gradient_x = gradient_x.convolution()
+        self._gradient_x, self._gradient_x_norm = gradient_x.convolution()
         
         # Convolution done on the image_matrix w.r.t gradient y
-        gradient_x = SeConvolve(self._smoothed_image, self._convolution_matrix_gy, mode='gradient')
-        self._gradient_y = gradient_x.convolution()
+        gradient_y = SeConvolve(self._smoothed_image, self._convolution_matrix_gy, mode='gradient')
+        self._gradient_y, self._gradient_y_norm = gradient_y.convolution()
         
         # We compute gradient magnitude, gradient angle and edge angle 
-        self._magnitude = self.calcuate_magnitude(self._gradient_x, self._gradient_y)
+        self._magnitude, self._magnitude_norm = self.calcuate_magnitude(self._gradient_x, self._gradient_y)
         self._angle, self._edge_angle = self.calculate_angle(self._gradient_x, self._gradient_y)
     
     # Step 3: Magnitude computation
@@ -198,13 +201,14 @@ class CannyEdgeDetector:
                 temp = (gradient_x[i, j] ** 2) + (gradient_y[i, j] ** 2)
                 
                 magnitude[i - 4, j - 4] = math.sqrt(temp)
-        
+
         # Nomralization of Magnitude
-        magnitude = magnitude / np.sum(magnitude)
+        magnitude_norm = magnitude / 360.624
         # same size as original image
         magnitude = np.pad(magnitude, 4, mode='constant')
+        magnitude_norm = np.pad(magnitude_norm, 4, mode='constant')
 
-        return magnitude
+        return magnitude, magnitude_norm
     
     def calculate_angle(self, gradient_x, gradient_y):
         
@@ -334,17 +338,17 @@ class CannyEdgeDetector:
         if os.path.isdir(name):
             shutil.rmtree(name)
 
-        os.mkdir(name + '/')
+        os.mkdir(name)
 
         # Output of step 1
         plt.imsave(name + '/' + 'GaussianSmoothing.bmp', self._smoothed_image, cmap='gray')
 
         # Output of step 2
-        plt.imsave(name + '/' + 'GradientX.bmp', self._gradient_x, cmap='gray')
-        plt.imsave(name + '/' + 'GradientY.bmp', self._gradient_y, cmap='gray')
+        plt.imsave(name + '/' + 'GradientX.bmp', self._gradient_x_norm, cmap='gray')
+        plt.imsave(name + '/' + 'GradientY.bmp', self._gradient_y_norm, cmap='gray')
 
         # Output of step 3
-        plt.imsave(name + '/' + 'GradientMagnitude.bmp', self._magnitude, cmap='gray')
+        plt.imsave(name + '/' + 'GradientMagnitude.bmp', self._magnitude_norm, cmap='gray')
 
         # Output of Step 4
         plt.imsave(name + '/' + 'Non-Max.bmp', self._non_max_output, cmap='gray')
