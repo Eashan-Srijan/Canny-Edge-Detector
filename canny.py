@@ -28,7 +28,7 @@ class CannyEdgeDetector:
         # Read Image
         self.image_read()
         # Gaussian Kernel used for smoothing
-        self._gaussian_kernel = np.array([[1.0,1.0,2.0,2.0,2.0,1.0,1.0],[1.0,2.0,2.0,4.0,2.0,2.0,1.0],[2.0,2.0,4.0,8.0,4.0,2.0,2.0],[2.0,4.0,8.0,16.0,8.0,4.0,2.0],[2.0,2.0,4.0,8.0,4.0,2.0,2.0],[1.0,2.0,2.0,4.0,2.0,2.0,1.0],[1.0,1.0,2.0,2.0,2.0,1.0,1.0]])
+        self._gaussian_kernel = np.array([[1,1,2,2,2,1,1],[1,2,2,4,2,2,1],[2,2,4,8,4,2,2],[2,4,8,16,8,4,2],[2,2,4,8,4,2,2],[1,2,2,4,2,2,1],[1,1,2,2,2,1,1]])
         # Gradient x and y operations Prewitt's Operators
         self._convolution_matrix_gx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
         self._convolution_matrix_gy = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]])
@@ -114,6 +114,9 @@ class CannyEdgeDetector:
         
     # This function reads the path provided to it and calls the convert_to_matrix
     def image_read(self):
+
+        # self._image_matrix = cv2.imread(self.image_path, cv2.IMREAD_GRAYSCALE)
+
         src = cv2.imread(self.image_path)
         self.img = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         
@@ -266,6 +269,8 @@ class CannyEdgeDetector:
         # for sector 3
         elif((157.5 >= angle > 112.5) or (337.5>= angle > 292.5)):
             return '3'
+        else:
+            print('wtf')
         
         # return '0'
     
@@ -279,26 +284,29 @@ class CannyEdgeDetector:
             return ((current_i-1,current_j), (current_i+1,current_j))
         elif(current_sector == '3'):
             return ((current_i-1,current_j-1), (current_i+1,current_j+1))
+        else:
+            print('wtf')
 
     # Step 5 Thresholding
     def thresholding(self):
 
-        temp_magnitude = copy.deepcopy(self._magnitude)
+        temp_magnitude = copy.deepcopy(self._non_max_output)
         temp_magnitude = temp_magnitude[4: temp_magnitude.shape[0] - 4, 4: temp_magnitude.shape[1] - 4].flatten()
+        temp_magnitude = temp_magnitude[temp_magnitude != 0]
 
         # output according to 25th Percentile
-        magnitude = copy.deepcopy(self._magnitude)
-        percentile = np.percentile(magnitude, 25)
+        magnitude = copy.deepcopy(self._non_max_output)
+        percentile = np.percentile(temp_magnitude, 25)
         self._threshold_output_25 = self.threshold(magnitude, percentile)
 
         # output according to 50th Percentile
-        magnitude = copy.deepcopy(self._magnitude)
-        percentile = np.percentile(magnitude, 50)
+        magnitude = copy.deepcopy(self._non_max_output)
+        percentile = np.percentile(temp_magnitude, 50)
         self._threshold_output_50 = self.threshold(magnitude, percentile)
 
         # output according to 75th Percentile  
-        magnitude = copy.deepcopy(self._magnitude)
-        percentile = np.percentile(magnitude, 75)
+        magnitude = copy.deepcopy(self._non_max_output)
+        percentile = np.percentile(temp_magnitude, 75)
         self._threshold_output_75 = self.threshold(magnitude, percentile)
     
     # this function performs thresholding
@@ -312,6 +320,8 @@ class CannyEdgeDetector:
 
                 if magnitude[i,j] < T:
                     magnitude[i,j] = 0
+                else:
+                    magnitude[i, j] = 1
         
         return magnitude
     
